@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claims Processing - Timing & Cost Breakdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0 20px 50px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -50px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .timeline-time {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .timeline-content h4 {
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content p {
+            color: #4b5563;
+            font-size: 0.95em;
+        }
+
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .cost-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .cost-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .cost-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cost-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .cost-table .total-row {
+            background: #f0f9ff;
+            font-weight: bold;
+            color: #0369a1;
+        }
+
+        .cost-table .total-row td {
+            border-top: 2px solid #0369a1;
+            border-bottom: 2px solid #0369a1;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .metric-card .label {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid;
+        }
+
+        .comparison-box.without {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+
+        .comparison-box.with {
+            background: #ecfdf5;
+            border-left-color: #10b981;
+        }
+
+        .comparison-box h4 {
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .comparison-box ul {
+            margin-left: 20px;
+            color: #4b5563;
+            line-height: 1.8;
+        }
+
+        .footer {
+            background: #f3f4f6;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .download-hint {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #92400e;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏱️ Timing & Cost Analysis</h1>
+            <p>Insurance Claims Processing System - Detailed Breakdown</p>
+        </div>
+
+        <div class="content">
+            <div class="download-hint">
+                💡 <strong>Tip:</strong> Press Ctrl+P (Cmd+P on Mac) to save this as PDF
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="section">
+                <h2>📊 Processing Timeline</h2>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">0ms</div>
+                        <div class="timeline-content">
+                            <h4>👤 User Submits Claim</h4>
+                            <p>Customer submits claim via web form, chat, or email with initial information</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">50ms ⚡</div>
+                        <div class="timeline-content">
+                            <h4>🔐 API Gateway Response</h4>
+                            <p><strong>User gets immediate feedback:</strong> "Claim received! ID: claim_abc123xyz"</p>
+                            <p>User is happy and can check status anytime. Processing continues in background...</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">100ms - 2s</div>
+                        <div class="timeline-content">
+                            <h4>🤖 Agent 1: Intake (Conversational)</h4>
+                            <p><strong>Duration:</strong> 2 seconds</p>
+                            <p><strong>Tokens:</strong> 507 input → 247 output</p>
+                            <p><strong>Cost:</strong> $0.0072</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">2s - 5s</div>
+                        <div class="timeline-content">
+                            <h4>📄 Agent 2: Document Extraction</h4>
+                            <p><strong>Duration:</strong> 3 seconds</p>
+                            <p><strong>Tokens:</strong> 650 input → 380 output</p>
+                            <p><strong>Cost:</strong> $0.0130</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">5s - 6s</div>
+                        <div class="timeline-content">
+                            <h4>🛡️ Agent 3: Coverage Verification</h4>
+                            <p><strong>Duration:</strong> 1 second</p>
+                            <p><strong>Tokens:</strong> 150 input → 100 output</p>
+                            <p><strong>Cost:</strong> $0.0000 (tool call, no LLM)</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">6s - 10s</div>
+                        <div class="timeline-content">
+                            <h4>⚠️ Agent 4: Severity Classification</h4>
+                            <p><strong>Duration:</strong> 4 seconds</p>
+                            <p><strong>Tokens:</strong> 580 input → 180 output</p>
+                            <p><strong>Cost:</strong> $0.0096</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">10s - 11s</div>
+                        <div class="timeline-content">
+                            <h4>🔀 Routing Engine</h4>
+                            <p><strong>Duration:</strong> 1 second</p>
+                            <p><strong>Action:</strong> Deterministic rule evaluation → assign to queue</p>
+                            <p><strong>Cost:</strong> $0.0000</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">11s - 11.5s</div>
+                        <div class="timeline-content">
+                            <h4>💾 Database Storage</h4>
+                            <p><strong>Duration:</strong> 0.5 seconds</p>
+                            <p><strong>Action:</strong> Save to RDS with Multi-AZ replication</p>
+                            <p><strong>Cost:</strong> $0.0000</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">11.5s - 12.5s</div>
+                        <div class="timeline-content">
+                            <h4>📧 Send Notifications</h4>
+                            <p><strong>Duration:</strong> 1 second</p>
+                            <p><strong>Actions:</strong> Email sent, added to claims team queue, status page updated</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">✅ 12.5s</div>
+                        <div class="timeline-content">
+                            <h4>PROCESSING COMPLETE</h4>
+                            <p>Claim is in queue, customer notified, ready for claims team review</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cost Breakdown -->
+            <div class="section">
+                <h2>💰 Cost Breakdown (Per Claim)</h2>
+
+                <table class="cost-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Duration</th>
+                            <th>Tokens In</th>
+                            <th>Tokens Out</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Intake Agent</strong></td>
+                            <td>2 sec</td>
+                            <td>507</td>
+                            <td>247</td>
+                            <td><strong>$0.0072</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Document Agent</strong></td>
+                            <td>3 sec</td>
+                            <td>650</td>
+                            <td>380</td>
+                            <td><strong>$0.0130</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coverage Agent</strong></td>
+                            <td>1 sec</td>
+                            <td>150</td>
+                            <td>100</td>
+                            <td><strong>$0.0000</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Severity Agent</strong></td>
+                            <td>4 sec</td>
+                            <td>580</td>
+                            <td>180</td>
+                            <td><strong>$0.0096</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Routing + Database</strong></td>
+                            <td>1.5 sec</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td><strong>$0.0000</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>TOTAL PER CLAIM</strong></td>
+                            <td><strong>12 sec</strong></td>
+                            <td><strong>1,887</strong></td>
+                            <td><strong>907</strong></td>
+                            <td><strong>$0.0328</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="cost-table" style="margin-top: 30px;">
+                    <thead>
+                        <tr>
+                            <th>Scale</th>
+                            <th>Volume</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Per Claim</strong></td>
+                            <td>1</td>
+                            <td><strong>$0.0328</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Per Hour</strong></td>
+                            <td>200 claims (50/min)</td>
+                            <td><strong>$6.56</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Per Day</strong></td>
+                            <td>4,800 claims</td>
+                            <td><strong>$157.44</strong></td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>Per Month</strong></td>
+                            <td><strong>30,000 claims</strong></td>
+                            <td><strong>$984</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="section">
+                <h2>📈 Performance Metrics</h2>
+
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="label">User Response Time</div>
+                        <div class="number">50ms</div>
+                        <div class="label">Instant Feedback</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Processing Time</div>
+                        <div class="number">12s</div>
+                        <div class="label">Async (not blocking)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Throughput</div>
+                        <div class="number">50</div>
+                        <div class="label">Claims per Minute</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Monthly Volume</div>
+                        <div class="number">30k</div>
+                        <div class="label">Claims</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Availability SLA</div>
+                        <div class="number">99.9%</div>
+                        <div class="label">Uptime</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Auto-scaling</div>
+                        <div class="number">2-10</div>
+                        <div class="label">ECS Tasks</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison -->
+            <div class="section">
+                <h2>🔄 Synchronous vs. Asynchronous</h2>
+
+                <div class="comparison">
+                    <div class="comparison-box without">
+                        <h4>❌ Without Async (Synchronous)</h4>
+                        <ul>
+                            <li>User waits 12 seconds</li>
+                            <li>Request ties up connection</li>
+                            <li>Timeout risk on slow networks</li>
+                            <li>Poor user experience</li>
+                            <li>Load balancer exhaustion at peak</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-box with">
+                        <h4>✅ With Async (Our Architecture)</h4>
+                        <ul>
+                            <li>User gets response in 50ms</li>
+                            <li>Processing happens in background</li>
+                            <li>User can check status anytime</li>
+                            <li>Excellent user experience</li>
+                            <li>Server resources optimized</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Token Analysis -->
+            <div class="section">
+                <h2>🔢 Token Efficiency Analysis</h2>
+
+                <p style="color: #4b5563; line-height: 1.8; margin-bottom: 15px;">
+                    The system processes claims efficiently by reusing context across agents. Each agent receives the
+                    accumulated state from previous agents, reducing redundant processing.
+                </p>
+
+                <table class="cost-table">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Input Tokens</th>
+                            <th>Output Tokens</th>
+                            <th>Input Cost</th>
+                            <th>Output Cost</th>
+                            <th>Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Intake</td>
+                            <td>507</td>
+                            <td>247</td>
+                            <td>$0.00507</td>
+                            <td>$0.00741</td>
+                            <td>$0.0124</td>
+                        </tr>
+                        <tr>
+                            <td>Document</td>
+                            <td>650</td>
+                            <td>380</td>
+                            <td>$0.00650</td>
+                            <td>$0.01140</td>
+                            <td>$0.0179</td>
+                        </tr>
+                        <tr>
+                            <td>Coverage</td>
+                            <td>150</td>
+                            <td>100</td>
+                            <td>$0.00000</td>
+                            <td>$0.00000</td>
+                            <td>$0.0000</td>
+                        </tr>
+                        <tr>
+                            <td>Severity</td>
+                            <td>580</td>
+                            <td>180</td>
+                            <td>$0.00580</td>
+                            <td>$0.00540</td>
+                            <td>$0.0112</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>TOTAL</strong></td>
+                            <td><strong>1,887</strong></td>
+                            <td><strong>907</strong></td>
+                            <td><strong>$0.01737</strong></td>
+                            <td><strong>$0.02421</strong></td>
+                            <td><strong>$0.0415</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="color: #666; margin-top: 15px; font-style: italic;">
+                    Note: Pricing based on GPT-4 Turbo model ($0.01/1K input, $0.03/1K output).
+                    Infrastructure costs not included.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Timing & Cost Breakdown | Insurance Claims Processing System</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Generated for architectural reference</p>
+        </div>
+    </div>
+</body>
+</html>

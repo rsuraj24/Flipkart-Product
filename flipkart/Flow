@@ -1,0 +1,39 @@
+USER SUBMITS CLAIM
+        ↓ (50ms - Instant)
+API GATEWAY
+  ├─ Validate input
+  ├─ Generate claim_id  
+  └─ Return "Claim received!"
+        ↓ (ASYNC - User already happy)
+ORCHESTRATION BACKEND (12 seconds)
+
+  AGENT 1: INTAKE (2 sec)
+  └─ Conversational collection
+  └─ Asks for missing info
+  
+  AGENT 2: DOCUMENT (3 sec)
+  └─ Vision model reads PDFs
+  └─ Extracts: policy #, coverage, deductible
+  
+  AGENT 3: COVERAGE (1 sec)
+  └─ Tool query to database
+  └─ Verifies: is_covered? Yes/No
+  
+  AGENT 4: SEVERITY (4 sec)
+  └─ GPT-4 structured JSON output
+  └─ Severity: high/medium/low
+  └─ Risk factors, missing info
+        ↓
+ROUTING ENGINE (1 sec)
+  ├─ if not_covered → deny_queue
+  ├─ elif missing_info → pending_docs_queue
+  ├─ elif severity==critical → urgent_queue
+  └─ else → standard_queue
+        ↓
+DATABASE STORE (0.5 sec)
+  └─ Save to RDS (with replication)
+        ↓
+SEND TO CUSTOMER
+  ├─ Email notification
+  ├─ Add to claims team dashboard
+  └─ Customer can check status anytime
